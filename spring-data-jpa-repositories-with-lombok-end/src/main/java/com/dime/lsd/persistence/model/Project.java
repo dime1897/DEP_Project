@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "Project")
+@Table(name = "project")
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
