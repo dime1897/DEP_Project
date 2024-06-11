@@ -35,6 +35,7 @@ public class Task {
     private TaskStatus status = TaskStatus.TO_DO;
 
     @ManyToOne(optional = false)
+    @JoinColumn(name = "project_id", referencedColumnName = "id")
     private Project project;
 
     @ManyToOne
