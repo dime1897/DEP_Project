@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  publisher:
+    build:
+      context: ./publisher
+    container_name: publisher
+    networks:
+      - example-network
+
+  subscriber:
+    build:
+      context: ./subscriber
+    container_name: subscriber
+    depends_on:
+      - publisher
+    networks:
+      - example-network
+
+networks:
+  example-network:
+    driver: bridge
