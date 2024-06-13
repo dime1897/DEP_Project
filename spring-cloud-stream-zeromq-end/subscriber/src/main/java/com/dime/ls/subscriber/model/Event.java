@@ -1,12 +1,12 @@
 package com.dime.ls.subscriber.model;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 @Data
@@ -14,9 +14,16 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Event<K, T> {
+
     public enum Type {CREATE, DELETE, UPDATE}
-    private Type eventType;
-    private K key;
-    private T data;
-    @Builder.Default private ZonedDateTime eventCreatedAt = ZonedDateTime.now();
+
+    @JsonProperty("eventType") private Type eventType;
+
+    @JsonProperty("key") private K key;
+
+    @JsonProperty("data") private T data;
+
+    @Builder.Default
+    @JsonProperty("eventCreatedAt")
+    private ZonedDateTime eventCreatedAt = ZonedDateTime.now();
 }
