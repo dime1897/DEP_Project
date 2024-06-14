@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
 import java.util.UUID;
@@ -22,8 +23,10 @@ public class EventPublisher {
     @Bean
     public CommandLineRunner publish() {
         return args -> {
-            try (ZMQ.Context context = ZMQ.context(1); ZMQ.Socket publisher = context.socket(ZMQ.PUB)) {
-                boolean bind = publisher.bind("tcp://*:5556");
+            try (ZMQ.Context context = ZMQ.context(1); ZMQ.Socket publisher = context.socket(SocketType.DEALER)) {
+                publisher.setIdentity(String.format("%04X-%04X", RANDOM.nextInt(), RANDOM.nextInt()).getBytes(ZMQ.CHARSET));
+                publisher.connect("tcp://subscriber:5555");
+
                 objectMapper.registerModule(new JavaTimeModule());
                 while (!Thread.currentThread().isInterrupted()) {
                     Event event = Event.builder()
@@ -32,8 +35,9 @@ public class EventPublisher {
                             .eventType(Event.Type.class.getEnumConstants()[RANDOM.nextInt(Event.Type.class.getEnumConstants().length)])
                             .build();
                     String stringEvent = objectMapper.writeValueAsString(event);
-                    log.info("Publishing: {}", stringEvent);
+
                     publisher.send(stringEvent.getBytes());
+                    log.info("Sent: {}", stringEvent);
                     Thread.sleep(1000);
                 }
             }

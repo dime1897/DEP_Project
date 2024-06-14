@@ -8,7 +8,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -44,7 +43,7 @@ public class SubscriberEvolutionApplication {
 	@DependsOn("taskExecutor")
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
 		return args -> {
-			for(int i = 0; i<1; i++) {
+			for(int i = 0; i<5; i++) {
 				ctx.getBean(ZeroMqReceiver.class).receiveMessages();
 			}
 		};
