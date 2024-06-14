@@ -1,4 +1,4 @@
-package com.dime.ls.subscriber;
+package com.dime.ls.subscriberevo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

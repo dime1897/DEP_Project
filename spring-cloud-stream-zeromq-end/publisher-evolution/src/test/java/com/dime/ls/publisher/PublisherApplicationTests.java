@@ -1,10 +1,10 @@
-package com.dime.ls.subscriber;
+package com.dime.ls.publisher;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SubscriberApplicationTests {
+class PublisherApplicationTests {
 
 	@Test
 	void contextLoads() {

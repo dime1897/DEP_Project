@@ -6,6 +6,8 @@
       <list>
         <option value="$PROJECT_DIR$/publisher/pom.xml" />
         <option value="$PROJECT_DIR$/subscriber/pom.xml" />
+        <option value="$PROJECT_DIR$/subscriber-evolution/pom.xml" />
+        <option value="$PROJECT_DIR$/publisher-evolution/pom.xml" />
       </list>
     </option>
   </component>
