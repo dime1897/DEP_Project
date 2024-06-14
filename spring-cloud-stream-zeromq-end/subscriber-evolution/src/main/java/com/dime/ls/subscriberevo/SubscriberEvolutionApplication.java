@@ -1,11 +1,12 @@
 package com.dime.ls.subscriberevo;
 
-import com.dime.ls.subscriberevo.model.ZeroMqReceiver;
+import com.dime.ls.subscriberevo.handler.ZeroMqReceiver;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -22,7 +23,6 @@ public class SubscriberEvolutionApplication {
 	}
 
 	@Bean(name = "taskExecutor")
-	@Order(1)
 	public Executor taskExecutor() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 		executor.setCorePoolSize(5);
@@ -35,13 +35,13 @@ public class SubscriberEvolutionApplication {
 
 	@Bean
     @Scope("prototype")
-	@Order(2)
+	@DependsOn({"taskExecutor", "commandLineRunner"})
     public ZeroMqReceiver zeroMqReceiver() {
         return new ZeroMqReceiver();
     }
 
-	@Bean
-	@Order(3)
+	@Bean(name = "commandLineRunner")
+	@DependsOn("taskExecutor")
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
 		return args -> {
 			for(int i = 0; i<1; i++) {

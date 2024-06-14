@@ -1,5 +1,6 @@
-package com.dime.ls.publisherevo.model;
+package com.dime.ls.publisherevo.source;
 
+import com.dime.ls.publisherevo.model.Event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ public class ZeroMqSender implements CommandLineRunner {
     public void run(String... args) throws Exception {
         try (ZContext context = new ZContext()) {
             ZMQ.Socket socket = context.createSocket(SocketType.PUSH);
+            //socket.setHWM(100);
             socket.bind("tcp://*:5555");
 
             objectMapper.registerModule(new JavaTimeModule());
@@ -39,6 +41,7 @@ public class ZeroMqSender implements CommandLineRunner {
                         .eventType(Event.Type.class.getEnumConstants()[RANDOM.nextInt(Event.Type.class.getEnumConstants().length)])
                         .build();
                 String stringEvent = objectMapper.writeValueAsString(event);
+                //LOG.info("Actual buffer size: {}", socket.getSendBufferSize());
                 LOG.info("Sending: {} --> {}", event.getEventType(), event);
                 socket.send(stringEvent.getBytes(), ZMQ.DONTWAIT);
                 Thread.sleep(1000);

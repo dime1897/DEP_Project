@@ -1,12 +1,10 @@
-package com.dime.ls.subscriberevo.model;
+package com.dime.ls.subscriberevo.handler;
 
+import com.dime.ls.subscriberevo.model.Event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
@@ -34,7 +32,7 @@ public class ZeroMqReceiver {
             objectMapper.registerModule(new JavaTimeModule());
 
             while (!Thread.currentThread().isInterrupted()) {
-                byte[] byteMessage = socket.recv(0); // Metodo bloccante
+                byte[] byteMessage = socket.recv(0); //bloccante
                 Event event = objectMapper.readValue(byteMessage, Event.class);
                 applicationEventPublisher.publishEvent(event);
                 System.out.println("Done");

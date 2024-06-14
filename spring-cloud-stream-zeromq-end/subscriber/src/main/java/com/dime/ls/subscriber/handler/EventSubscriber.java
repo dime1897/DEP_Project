@@ -1,6 +1,6 @@
-package com.dime.ls.subscriberevo.source;
+package com.dime.ls.subscriber.handler;
 
-import com.dime.ls.subscriberevo.model.Event;
+import com.dime.ls.subscriber.model.Event;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;

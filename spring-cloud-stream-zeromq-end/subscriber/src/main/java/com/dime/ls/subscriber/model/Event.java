@@ -1,4 +1,4 @@
-package com.dime.ls.subscriberevo.model;
+package com.dime.ls.subscriber.model;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,6 +1,6 @@
-package com.dime.ls.publisherevo.handler;
+package com.dime.ls.publisher.source;
 
-import com.dime.ls.publisherevo.model.Event;
+import com.dime.ls.publisher.model.Event;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;

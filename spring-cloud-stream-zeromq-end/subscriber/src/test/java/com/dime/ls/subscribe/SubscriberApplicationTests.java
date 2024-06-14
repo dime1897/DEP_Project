@@ -1,4 +1,4 @@
-package com.dime.ls.subscriberevo;
+package com.dime.ls.subscribe;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

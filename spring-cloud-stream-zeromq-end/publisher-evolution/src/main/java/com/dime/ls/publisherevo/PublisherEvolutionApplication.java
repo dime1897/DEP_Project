@@ -1,6 +1,6 @@
 package com.dime.ls.publisherevo;
 
-import com.dime.ls.publisherevo.model.ZeroMqSender;
+import com.dime.ls.publisherevo.source.ZeroMqSender;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
