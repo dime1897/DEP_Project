@@ -39,7 +39,7 @@ public class EventProducer {
     }
 
     @Scheduled(fixedRate = 1000)
-    public void EventProduction() {
+    public void eventProduction() {
         Event event = Event.builder()
                             .data("Hello World!")
                             .key(UUID.randomUUID().toString())

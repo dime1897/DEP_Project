@@ -1,40 +1,61 @@
 package com.dime.ls.subscriber.handler;
 
 import com.dime.ls.subscriber.model.Event;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
+import java.io.IOException;
+
 @Slf4j
-@Configuration
+@Component
 public class EventSubscriber {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Bean
-    public CommandLineRunner receive() {
-        return args -> {
-            try (ZMQ.Context context = ZMQ.context(1); ZMQ.Socket subscriber = context.socket(SocketType.SUB)) {
-                subscriber.connect("tcp://publisher:5555");
+    private final ZMQ.Context context = ZMQ.context(1);
 
-                String[] topicNames = System.getenv("TOPIC_NAMES").split(",");
-                for (String topicName : topicNames) subscriber.subscribe(topicName.trim().getBytes(ZMQ.CHARSET)); //SUB topic specified in env variables by docker-compose-file
+    private final ZMQ.Socket subscriber = context.socket(SocketType.SUB);
 
-                objectMapper.registerModule(new JavaTimeModule());
-                while (!Thread.currentThread().isInterrupted()) {
-                    String topic = subscriber.recvStr();
-                    log.info("Received on topic: {}", topic);
-                    byte[] message = subscriber.recv();
-                    Event event = objectMapper.readValue(message, Event.class);
-                    log.info("Received: {}", event);
-                    Thread.sleep(2500);
-                }
-            }
-        };
+    public EventSubscriber() {
+
+        objectMapper.registerModule(new JavaTimeModule());
+
+        //Local running configuration
+        //subscriber.connect("tcp://localhost:5555");
+        //subscriber.subscribe("topic-0".getBytes());
+
+        //Containerized running configuration
+        subscriber.connect("tcp://publisher:5555");
+        String[] topicNames = System.getenv("TOPIC_NAMES").split(",");
+        for (String topicName : topicNames) subscriber.subscribe(topicName.trim().getBytes(ZMQ.CHARSET));
+
+    }
+
+    @Scheduled(fixedRate = 2500)
+    public void eventRetrieving(){
+
+        String topic = subscriber.recvStr();
+        log.info("Got event from topic: {}", topic);
+
+        byte[] byteEvent = subscriber.recv();
+        Event event = null;
+        try{
+            event = objectMapper.readValue(byteEvent, Event.class);
+        } catch (IOException e) {
+            log.error("Unable to map JSON to event");
+        } finally {
+            log.info("Got event: {}", event);
+        }
+
     }
 }

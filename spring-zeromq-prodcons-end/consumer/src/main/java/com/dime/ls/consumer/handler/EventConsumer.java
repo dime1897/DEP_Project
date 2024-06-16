@@ -28,11 +28,12 @@ public class EventConsumer {
     }
 
     @Scheduled(fixedRate = 2500)
-    public void EventConsumption() {
+    public void eventConsumption() {
 
         ZMsg msg = ZMsg.recvMsg(consumer);
 
         String sock_identity = new String(msg.pop().getData(), ZMQ.CHARSET);
+        //log.info("Identity: {}", sock_identity);
         String message = new String(msg.pop().getData(), ZMQ.CHARSET);
         Event event = null;
         try {
@@ -40,7 +41,6 @@ public class EventConsumer {
         } catch (JsonProcessingException e){
             log.error("Unable to map JSON to Event");
         } finally {
-            //log.info("Identity: {}", sock_identity);
             log.info("Received: {}", event);
         }
     }
