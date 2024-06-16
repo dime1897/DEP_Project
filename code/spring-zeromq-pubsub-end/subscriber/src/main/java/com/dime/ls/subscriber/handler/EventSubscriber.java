@@ -4,6 +4,7 @@ import com.dime.ls.subscriber.model.Event;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,24 +22,15 @@ import java.io.IOException;
 @Component
 public class EventSubscriber {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
-    private final ZMQ.Context context = ZMQ.context(1);
+    private  ZMQ.Socket subscriber;
 
-    private final ZMQ.Socket subscriber = context.socket(SocketType.SUB);
+    @Autowired
+    public EventSubscriber(ZMQ.Socket subscriber, ObjectMapper objectMapper) {
 
-    public EventSubscriber() {
-
-        objectMapper.registerModule(new JavaTimeModule());
-
-        //Local running configuration
-        //subscriber.connect("tcp://localhost:5555");
-        //subscriber.subscribe("topic-0".getBytes());
-
-        //Containerized running configuration
-        subscriber.connect("tcp://publisher:5555");
-        String[] topicNames = System.getenv("TOPIC_NAMES").split(",");
-        for (String topicName : topicNames) subscriber.subscribe(topicName.trim().getBytes(ZMQ.CHARSET));
+        this.subscriber = subscriber;
+        this.objectMapper = objectMapper;
 
     }
 
@@ -51,7 +43,6 @@ public class EventSubscriber {
 
         byte[] byteEvent = subscriber.recv();
         Event event = objectMapper.readValue(byteEvent, Event.class);
-        log.error("Unable to map JSON to event");
         log.info("Got event: {}", event);
 
     }

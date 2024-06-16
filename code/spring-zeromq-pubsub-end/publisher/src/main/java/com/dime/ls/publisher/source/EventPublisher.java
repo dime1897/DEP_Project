@@ -2,13 +2,12 @@ package com.dime.ls.publisher.source;
 
 import com.dime.ls.publisher.model.Event;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.zeromq.SocketType;
 import org.zeromq.ZMQ;
 
 import java.util.UUID;
@@ -20,17 +19,15 @@ public class EventPublisher {
 
     private static final RandomGenerator RANDOM = RandomGenerator.getDefault();
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
-    private final ZMQ.Context context = ZMQ.context(1);
+    private ZMQ.Socket publisher;
 
-    private final ZMQ.Socket publisher = context.socket(SocketType.PUB);
+    @Autowired
+    public EventPublisher(ZMQ.Socket publisher, ObjectMapper objectMapper){
 
-    public EventPublisher(){
-
-        objectMapper.registerModule(new JavaTimeModule());
-
-        publisher.bind("tcp://*:5555");
+        this.publisher = publisher;
+        this.objectMapper = objectMapper;
 
     }
 
@@ -48,7 +45,6 @@ public class EventPublisher {
         log.info("Choosen topic is {}", topic);
 
         String stringEvent = objectMapper.writeValueAsString(event);
-        log.error("Unable to map event to JSON");
         publisher.sendMore(topic.getBytes(ZMQ.CHARSET));
         publisher.send(stringEvent.getBytes(ZMQ.CHARSET));
         log.info("Event published: {}", stringEvent);
