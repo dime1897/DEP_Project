@@ -6,6 +6,8 @@ services:
     container_name: producer
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - IDENTITY=producer-0
+      - CONSUMERS_NAMES=consumer-0,consumer-1
     depends_on:
       consumer-0:
           condition: service_healthy
