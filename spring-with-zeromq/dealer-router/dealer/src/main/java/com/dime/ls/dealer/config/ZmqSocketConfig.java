@@ -17,6 +17,9 @@ public class ZmqSocketConfig {
     
     @Value("${DELIMITER}")
     private String delimiter;
+
+    @Value("${router.port}")
+    private int routerPort;
     
     @Bean(destroyMethod = "close")
     public ZMQ.Socket zmqDealer(){
@@ -26,7 +29,11 @@ public class ZmqSocketConfig {
         
         dealer.setIdentity(this.identity.trim().getBytes(ZMQ.CHARSET));
         String[] consumersNamesArray = this.consumersNames.split(delimiter);
-        for (String consumer : consumersNamesArray) dealer.connect("tcp://" + consumer.trim() + ":5555");
+
+        for (String consumer : consumersNamesArray) {
+            String connectAddress = String.format("tcp://%s:%d", consumer.trim(), routerPort);
+            dealer.connect(connectAddress);
+        }
 
         return dealer;
 

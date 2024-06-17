@@ -9,10 +9,11 @@ import org.zeromq.ZMQ;
 @Configuration
 public class ZmqSocketConfig {
 
-    //@Value("${publisher.port}")
-    //private int publisherPort;
+    @Value("${publisher.port}")
+    private int publisherPort;
 
-    private final String publisherAddress = "tcp://*:5555";
+    @Value("${publisher.name}")
+    private String publisherName;
 
     @Bean(destroyMethod = "close")
     public ZMQ.Socket zmqPublisher() {
@@ -20,7 +21,8 @@ public class ZmqSocketConfig {
         ZMQ.Context context = ZMQ.context(1);
         ZMQ.Socket publisher = context.socket(SocketType.PUB);
 
-        publisher.bind(publisherAddress);
+        String bindAddress = String.format("tcp://%s:%d", publisherName, publisherPort);
+        publisher.bind(bindAddress);
 
         return publisher;
     }
