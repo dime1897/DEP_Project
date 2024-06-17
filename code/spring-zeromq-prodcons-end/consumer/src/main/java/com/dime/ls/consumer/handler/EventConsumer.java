@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.zeromq.SocketType;
@@ -16,16 +17,17 @@ import org.zeromq.ZMsg;
 @Component
 public class EventConsumer {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
-    private final ZMQ.Context context = ZMQ.context(1);
+    private ZMQ.Socket consumer;
 
-    private final ZMQ.Socket consumer = context.socket(SocketType.ROUTER);
+    @Autowired
+    public EventConsumer(ZMQ.Socket consumer, ObjectMapper objectMapper) {
 
-    public EventConsumer() {
-        objectMapper.registerModule(new JavaTimeModule());
+        this.consumer = consumer;
 
-        consumer.bind("tcp://*:5555");
+        this.objectMapper = objectMapper;
+
     }
 
     @Scheduled(fixedRate = 2500)
@@ -38,7 +40,6 @@ public class EventConsumer {
         //log.info("Identity: {}", sock_identity);
         String message = new String(msg.pop().getData(), ZMQ.CHARSET);
         Event event = objectMapper.readValue(message, Event.class);
-        log.error("Unable to map JSON to Event");
         log.info("Received: {}", event);
     }
 

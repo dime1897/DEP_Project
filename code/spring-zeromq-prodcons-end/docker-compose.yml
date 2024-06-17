@@ -8,6 +8,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - IDENTITY=producer-0
       - CONSUMERS_NAMES=consumer-0,consumer-1
+      - DELIMITER=,
     depends_on:
       consumer-0:
           condition: service_healthy

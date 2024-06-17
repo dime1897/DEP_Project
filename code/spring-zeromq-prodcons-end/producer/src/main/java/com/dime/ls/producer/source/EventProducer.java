@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.zeromq.SocketType;
@@ -20,23 +21,17 @@ public class EventProducer {
 
     private static final RandomGenerator RANDOM = RandomGenerator.getDefault();
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
-    private final ZMQ.Context context = ZMQ.context(1);
+    private ZMQ.Socket producer;
 
-    private final ZMQ.Socket producer = context.socket(SocketType.DEALER);
+    @Autowired
+    public EventProducer(ZMQ.Socket producer, ObjectMapper objectMapper) {
 
-    public EventProducer() {
-        objectMapper.registerModule(new JavaTimeModule());
+        this.objectMapper = objectMapper;
 
-        //Containerized running configuration
-        producer.setIdentity(System.getenv("IDENTITY").trim().getBytes(ZMQ.CHARSET));
-        String[] consumersNames = System.getenv("CONSUMERS_NAMES").split(",");
-        for (String consumer : consumersNames) producer.connect("tcp://" + consumer.trim() + ":5555");
+        this.producer = producer;
 
-        //Local running configuration
-        //producer.setIdentity("PRODUCER-0".getBytes(ZMQ.CHARSET));
-        //producer.connect("tcp://localhost:5555");
     }
 
     @Scheduled(fixedRate = 1000)
@@ -48,7 +43,6 @@ public class EventProducer {
                 .eventType(Event.Type.class.getEnumConstants()[RANDOM.nextInt(Event.Type.class.getEnumConstants().length)])
                 .build();
         String stringEvent = objectMapper.writeValueAsString(event);
-        log.error("Unable to map event to JSON");
         log.info("Sent: {}", stringEvent);
         producer.send(stringEvent);
     }

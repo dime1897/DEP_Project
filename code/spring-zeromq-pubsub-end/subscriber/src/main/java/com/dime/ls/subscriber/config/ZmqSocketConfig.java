@@ -11,7 +11,7 @@ public class ZmqSocketConfig {
 
     private final String publisherAddress = "tcp://publisher:5555"; //subscriber.connect("tcp://localhost:5555");
 
-    @Value("${TOPIC_NAMES}") // Nome della variabile d'ambiente per i nomi dei topic
+    @Value("${TOPIC_NAMES}")
     private String topicNamesEnv;
 
     @Bean(destroyMethod = "close")
