@@ -98,3 +98,5 @@ ZeroMQ forces default limits on its internal buffers (the so-called high-water m
 In light of what we have seen, we can conclude that the ROUTER-DEALER is a non-standard configuration, but one that we can misuse to obtain interesting characteristics. We can see it as a PUB-SUB system where the first SUB to receive the message processes the result (this can be useful in very specific contexts).
 
 As for the PUB-SUB system, we are in the classic context where we have the guarantee that all subscribers receive the messages, but only after subscribing. Indeed, if guarantees are needed for messages prior to the subscription, it is the developer's responsibility to implement synchronization mechanisms between publishers and subscribers (e.g., service discovery).
+
+In this guide, we have tried to condense the key concepts of ZeroMQ, but if you want to go deeper, you can consult the [official documentation](https://zguide.zeromq.org/).
