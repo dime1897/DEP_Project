@@ -13,7 +13,7 @@ public class ZmqSocketConfig {
     private String identity;
     
     @Value("${ROUTERS_NAMES}")
-    private String consumersNames;
+    private String routersNames;
     
     @Value("${DELIMITER}")
     private String delimiter;
@@ -28,10 +28,10 @@ public class ZmqSocketConfig {
         ZMQ.Socket dealer = context.socket(SocketType.DEALER);
         
         dealer.setIdentity(this.identity.trim().getBytes(ZMQ.CHARSET));
-        String[] consumersNamesArray = this.consumersNames.split(delimiter);
+        String[] routersNamesArray = this.routersNames.split(delimiter);
 
-        for (String consumer : consumersNamesArray) {
-            String connectAddress = String.format("tcp://%s:%d", consumer.trim(), routerPort);
+        for (String router : routersNamesArray) {
+            String connectAddress = String.format("tcp://%s:%d", router.trim(), routerPort);
             dealer.connect(connectAddress);
         }
 

@@ -27,6 +27,12 @@ ZeroMQ uses specific messaging patterns to route and queue messages effectively.
 
 In the following, we're going to exlpore in particular the REQ-REP and the PUB-SUB pattern.
 
+### PUSH - PULL and PAIR - PAIR patterns
+
+PUSH-PULL sockets simply involve producers sending messages via the PUSH socket and consumers reading from the PULL socket. This configuration is also recommended for load balancing because the PUSH socket distributes messages in a round-robin manner among the connected PULL sockets. We won't go into the specifics of this configuration as the following (DEALER-ROUTER) is quite similar.
+
+PAIR-PAIR sockets are exclusively connected sockets, essentially implementing PUSH-PULL in both directions but only between the two endpoints. This is not particularly useful for us since we may need to communicate with multiple endpoints simultaneously.
+
 ### REQUEST - REPLY pattern
 
 First of all we need to specify that this pattern builds one-to-one synchronous communications between nodes and data are exchanged in envelopes. Those are fundamental because they allow packaging data with an address without altering the data itself. This enables the creation of intermediaries like APIs and proxies that manage addresses independently of message content. Moreover, the envelope contains the return address for replies so it facilitates round-trip request-reply dialogs in a stateless ZeroMQ network. The good news is that REQ and REP sockets manage envelopes automatically, where developers typically don't interact directly with them.
@@ -70,7 +76,7 @@ In the example we'll see in the next guide, take advantage of ROUTER-DEALER comb
 
 Nice usage of ROUTER-DEALER pattern is for load balancing purposes. We've already said that DEALER and ROUTER sockets can bind/connect multiple endpoints simultaneously, so it's possible to have one dealer which delivers messages to multiple routers. In this configuration, we can notice (and in the next guide we'll see) that only one router take in handling the request coming from the dealer, like it has been ACKed.
 
-### PUB-SUB pattern
+### PUB - SUB pattern
 
 This patter is born to make PUB sending each message to “all of many” (subs) with in the purpose of being very scalable. This means large volumes of data, sent rapidly to many recipients. To get scalability, PUB-SUB uses the same trick as push-pull, which is to get rid of back-chatter. This means that recipients don’t talk back to senders. There are some exceptions, e.g., SUB sockets will send subscriptions to PUB sockets, but it’s anonymous and infrequent. When we remove back-chatter, our overall message flow becomes much simpler, which lets us make simpler APIs, simpler protocols, and in general reach many more people. But we also remove any possibility to coordinate senders and receivers. What this means is:
 
